@@ -1,1 +1,1 @@
-web: bundle exec boot.sh $PORT
+web: bundle exec rackup config.ru -p $PORT

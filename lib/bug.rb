@@ -1,0 +1,1 @@
+class Bug < StandardError; end

@@ -4,6 +4,7 @@ pid = Process.spawn("bundle exec ruby -Ilib dispatcher.rb", :out => :out, :err =
 puts "SPAWNED #{pid}"
 
 get '/' do
+  Process.kill 'ALRM', pid
   puts "wheres my std out?"
   "hello world"
 end

@@ -1,1 +1,1 @@
-web: bundle exec boot.sh $PORT
+web: pwd && echo $PATH && bundle exec boot.sh $PORT

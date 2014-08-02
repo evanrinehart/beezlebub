@@ -2,6 +2,8 @@ require 'sequel'
 require 'dispatcher'
 require 'db'
 
+puts "DISPATCHER REPORTING"
+puts "dispatcher booting up!"
 db = db_connect
 
 at_exit do

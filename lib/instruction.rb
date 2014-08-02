@@ -7,7 +7,7 @@ end
 
 class TryAgainAt
   attr_reader :timestamp
-  def intialize timestamp
+  def initialize timestamp
     @timestamp = timestamp
   end
 end

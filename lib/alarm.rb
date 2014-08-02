@@ -9,7 +9,6 @@ module Alarm
   # and the internal alarm is cleared. Until the on_alarm method
   # finishes, the process will ignore alarm signals.
 
-
   # Enter an event loop that never returns.
   # Calls the classes on_alarm method when the alarm signal occurs.
   def run
@@ -22,11 +21,18 @@ module Alarm
       @wpipe.write 'x'
     end
 
+    # run once on boot
+    on_alarm
+
     loop do
       # drain everything from the pipe without blocking FIXME
       result = IO.select [@rpipe], [], [], 0
       if result
-        @rpipe.read_nonblock 4096
+        drainage = @rpipe.read_nonblock 4096
+        if drainage.length > 0
+          # at most one signal during work will be deferred
+          on_alarm
+        end
       end
 
       # block until at least one char was written to the pipe
@@ -42,7 +48,7 @@ module Alarm
 
   # set (or replace) the alarm clock
   def set_interruptible_alarm_for timestamp
-    seconds = timestamp - now
+    seconds = (timestamp - Time.now) + 1
     @alarm_lock.synchronize do
       @alarm_thread.kill if @alarm_thread
       @alarm_thread = Thread.new do

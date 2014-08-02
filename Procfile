@@ -1,2 +1,2 @@
-web: bundle exec rackup config.ru -p 51918
+web: bundle exec rackup config.ru -p $PORT
 dispatcher: ruby dispatcher.rb

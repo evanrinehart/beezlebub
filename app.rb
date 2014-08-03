@@ -1,9 +1,19 @@
 require 'sinatra'
+require 'sinatra/sequel'
+require 'json'
 
-#pid = Process.spawn("bundle exec ruby -Ilib dispatcher.rb", :out => :out, :err => :err)
-#puts "SPAWNED #{pid}"
+before do
+  content_type 'application/json'
+end
 
 get '/' do
-  #Process.kill 'ALRM', pid
-  "hello world"
+  JSON.pretty_generate database[:messages].all
+end
+
+post '/events' do
+  # verify secret
+  # validate event
+  # compute messages from event name
+  # insert event and messages
+  # return event id
 end

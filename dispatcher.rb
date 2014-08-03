@@ -8,7 +8,7 @@ $stderr.sync = true
 puts 'Dispatcher online'
 
 pid = Process.pid
-IO.write('/var/run/dispatcher.pid', pid)
+IO.write('/var/tmp/dispatcher.pid', pid)
 
 db = db_connect
 

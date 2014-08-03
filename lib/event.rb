@@ -1,11 +1,5 @@
-class Event
+require 'sequel'
 
-  attr_reader :id, :name, :payload
-
-  def initialize(id:,name:,payload:)
-    @id = id
-    @name = name
-    @payload = payload
-  end
+class Event < Sequel::Model
   
 end

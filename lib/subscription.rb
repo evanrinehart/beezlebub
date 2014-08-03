@@ -1,12 +1,8 @@
-class Subscription
+require 'sequel'
+require 'app'
 
-  attr_reader :id, :app, :event_name, :push_uri
+class Subscription < Sequel::Model
 
-  def initialize(id:, app:, event_name: push_uri:, secret:)
-    @id = id
-    @app = app
-    @event_name = event_name
-    @push_uri = push_uri
-  end
+  many_to_one :app
 
 end

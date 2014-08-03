@@ -1,26 +1,34 @@
-class Message
+require 'subscription'
+require 'event'
 
-  attr_reader :id, :push_uri, :payload, :secret
-  attr_reader :event_id, :subscription_id
+class Message < Sequel::Model
 
-  def initialize(id:, push_uri:, payload:, secret:, event_id:, subscription_id:, content_type:)
-    @id = id
-    @push_uri = push_uri
-    @payload = payload
-    @secret = secret
-    @content_type = content_type
+  many_to_one :subscription
+  many_to_one :event
 
-    @event_id = event_id
-    @subscription_id = subscription_id
-  end
-
-  def retry_record timestamp
-    {
+  def new_retry timestamp
+    Message.new(
       :event_id => event_id,
       :subscription_id => subscription_id,
       :status => 'pending',
       :retry_at => timestamp
-    }
+    )
+  end
+
+  def push_uri
+    subscription.push_uri
+  end
+
+  def content_type
+    event.content_type
+  end
+
+  def payload
+    event.payload
+  end
+
+  def secret
+    subscription.app.secret
   end
 
 end

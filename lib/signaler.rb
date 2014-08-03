@@ -1,5 +1,8 @@
 class Signaler
 
+  # wrapper for Process.kill 'ALRM' which caches the target pid
+  # used to wake up the dispatcher process
+
   PID_PATH = '/var/tmp/dispatcher.pid'
 
   def initialize pid_path=PID_PATH
@@ -8,7 +11,6 @@ class Signaler
   end
 
   def get_pid # caching property reader
-puts 'trying to get pid'
     return @pid if @pid
     return nil if !File.exists?(@pid_path)
 
@@ -24,7 +26,6 @@ puts 'trying to get pid'
   def signal
     pid = get_pid
     if pid
-puts "SIGNALLING PROCESS #{pid}"
       Process.kill 'ALRM', pid
     end
     nil

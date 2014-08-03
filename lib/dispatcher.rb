@@ -3,20 +3,23 @@ require 'sequel'
 require 'instruction'
 require 'bug'
 require 'http_simple'
-require 'db'
 require 'message'
 require 'exception'
+require 'sender'
 
 class Dispatcher
 
   include Alarm
+  # run
+  # set_interruptible_alarm_for
 
-  attr_reader :db
+  attr_reader :database
 
   class DeliveryFailed < StandardError; end
 
-  def initialize db
-    @db = db
+  def initialize(database:, sender:)
+    @database = database
+    @sender = sender
   end
 
   def on_alarm
@@ -40,49 +43,32 @@ class Dispatcher
         else raise Bug, "what_to_do = #{instruction.inspect} ??"
       end
     end
+    nil
   end
 
   def what_to_do
-    db.transaction(
+    database.transaction(
       :isolation => :serializable,
       :retry_on => [Sequel::SerializationFailure]
     ) do
-      rows = db[:messages]
-        .join(:events, :id => :event_id)
-        .join(:subscriptions, :id => :messages__subscription_id)
-        .join(:apps, :id => :app_id)
-        .select(:messages__id, :payload, :apps__secret, :push_uri, :content_type)
-        .select_append(:event_id, :subscription_id)
+
+      messages = Message
+        .eager(:subscription, :event => :app)
         .where(:status => 'pending')
         .where('retry_at is null OR retry_at < now()')
 
-      if rows.count > 0
-        messages = rows.map do |row|
-          Message.new(
-            id: row[:id],
-            payload: row[:payload],
-            push_uri: row[:push_uri],
-            secret: row[:secret],
-            event_id: row[:event_id],
-            subscription_id: row[:subscription_id],
-            content_type: row[:content_type]
-          )
-        end
-
+      if messages.count > 0
         return AttemptToSendMessages.new(messages)
       end
 
-      rows = db[:messages]
-        .join(:events, :id => :event_id)
-        .join(:subscriptions, :id => :messages__subscription_id)
-        .join(:apps, :id => :app_id)
-        .select(:messages__id, :payload, :apps__secret, :push_uri, :retry_at)
+      messages = Message
+        .eager(:subscription, :event => :app)
         .where(:status => 'pending')
         .where('retry_at is not null')
         .order(:retry_at)
 
-      if rows.count > 0
-        return TryAgainAt.new(rows.first[:retry_at]+5)
+      if messages.count > 0
+        return TryAgainAt.new(messages.first.retry_at + 5)
       else
         return NothingToDo.new
       end
@@ -90,42 +76,28 @@ class Dispatcher
   end
 
   def attempt_delivery message
-    db.transaction do
-      record = db[:messages].where(:id => message.id)
+    database.transaction do
       begin
-        begin
-puts "posting message #{message.id}"
-          response = HTTPSimple::post(
-            message.push_uri,
-            body: message.payload,
-            headers: {
-              'Content-Type' => message.content_type,
-              'X-Event-Secret' => message.secret
-            }
-          )
-puts "response = #{response}"
-        rescue HTTPSimple::ResponseException => e
-          raise DeliveryFailed, e.failure_report
-        rescue HTTPSimple::NetworkException => e
-          raise DeliveryFailed, "#{e.class} #{e.message}"
-        end
-      rescue DeliveryFailed => e
-puts "failure\n\n#{e.message}\n\n\n"
+        @sender.attempt_send message
+      rescue Sender::DeliveryFailed => e
+
         retry_at = Time.now + 15
-        record.update(
+        message.update(
           :delivered_at => Sequel::CURRENT_TIMESTAMP,
           :status => 'failed',
           :failure => e.message
         )
-        db[:messages].insert message.retry_record(retry_at)
+        message.new_retry(retry_at).save
         'failure'
+
       else
-puts "success"
-        record.update(
-          :delivered_at => 'current_timestamp',
+
+        message.update(
+          :delivered_at => Sequel::CURRENT_TIMESTAMP,
           :status => 'delivered'
         )
         'success'
+
       end
     end
   end

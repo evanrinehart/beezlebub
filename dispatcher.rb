@@ -1,6 +1,7 @@
 require 'sequel'
+require 'db' # connects to database
 require 'dispatcher'
-require 'db'
+require 'sender'
 
 $stdout.sync = true
 $stderr.sync = true
@@ -11,11 +12,13 @@ PID_PATH = '/var/tmp/dispatcher.pid'
 pid = Process.pid
 IO.write(PID_PATH, pid)
 
-db = db_connect
-
 at_exit do
+  $database.disconnect
   File.unlink PID_PATH
-  db.disconnect
 end
 
-Dispatcher.new(db).run # never returns
+# never returns
+Dispatcher.new(
+  database: $database,
+  sender: Sender.new
+).run

@@ -48,6 +48,10 @@ module HTTPSimple
     generic_http_exec :put, uri_string, query, body, headers
   end
 
+  def self.patch uri_string, query:{}, body:'', headers:{}
+    generic_http_exec :patch, uri_string, query, body, headers
+  end
+
   private
 
   def self.generic_http_exec meth, uri_string, query, body, headers

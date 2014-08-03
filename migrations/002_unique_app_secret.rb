@@ -1,7 +1,9 @@
 Sequel.migration do
 
-  def change
-    add_index :apps, :secret, :unique => true
+  change do
+    alter_table :apps do
+      add_index :secret, :unique => true
+    end
   end
 
 end

@@ -51,7 +51,7 @@ class Dispatcher
         .join(:events, :id => :event_id)
         .join(:subscriptions, :id => :messages__subscription_id)
         .join(:apps, :id => :app_id)
-        .select(:messages__id, :payload, :apps__secret, :push_uri)
+        .select(:messages__id, :payload, :apps__secret, :push_uri, :content_type)
         .select_append(:event_id, :subscription_id)
         .where(:status => 'pending')
         .where('retry_at is null OR retry_at < now()')
@@ -64,7 +64,8 @@ class Dispatcher
             push_uri: row[:push_uri],
             secret: row[:secret],
             event_id: row[:event_id],
-            subscription_id: row[:subscription_id]
+            subscription_id: row[:subscription_id],
+            content_type: row[:content_type]
           )
         end
 
@@ -98,6 +99,7 @@ puts "posting message #{message.id}"
             message.push_uri,
             body: message.payload,
             headers: {
+              'Content-Type' => message.content_type,
               'X-Event-Secret' => message.secret
             }
           )

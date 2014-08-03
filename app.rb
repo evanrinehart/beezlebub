@@ -7,6 +7,9 @@ before do
 end
 
 get '/' do
+  pid = IO.read('/var/run/dispatcher.pid')
+  puts "pid = #{pid}"
+  Process.kill 'ALRM', pid
   JSON.pretty_generate database[:messages].all
 end
 

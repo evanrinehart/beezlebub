@@ -5,8 +5,11 @@ require 'db'
 $stdout.sync = true
 $stderr.sync = true
 
-puts "DISPATCHER REPORTING"
-puts "dispatcher booting up!"
+puts 'Dispatcher online'
+
+pid = Process.pid
+IO.write('/var/run/dispatcher.pid', pid)
+
 db = db_connect
 
 at_exit do

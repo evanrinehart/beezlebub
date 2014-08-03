@@ -51,13 +51,14 @@ post '/events' do
     )
       
     subscriptions = database[:subscriptions].where(:event_name => name)
-    subscriptions.each do |row|
-      database[:messages].insert(
+    new_messages = subscriptions.map do |row|
+      {
         :event_id => event_id,
         :subscription_id => row[:id],
         :status => 'pending'
-      )
+      }
     end
+    database[:messages].multi_insert new_messages
 
     [event_id, subscriptions.count]
   end

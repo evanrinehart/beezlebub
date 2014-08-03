@@ -7,7 +7,7 @@ task "test" do
     require path
   end
 
-  Dir['./test/unit/*.rb'].each do |path|
+  Dir['./test/{unit,functional}/*.rb'].each do |path|
     require path
   end
 end

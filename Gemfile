@@ -10,4 +10,5 @@ gem 'foreman'
 
 group :test do
   gem 'factory_girl'
+  gem 'rack-test'
 end

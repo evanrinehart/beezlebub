@@ -23,6 +23,8 @@ GEM
     rack (1.5.2)
     rack-protection (1.5.3)
       rack
+    rack-test (0.6.2)
+      rack (>= 1.0)
     sequel (4.13.0)
     sinatra (1.4.5)
       rack (~> 1.4)
@@ -45,6 +47,7 @@ DEPENDENCIES
   factory_girl
   foreman
   pg
+  rack-test
   sequel
   sinatra
   sinatra-sequel

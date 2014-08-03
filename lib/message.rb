@@ -3,7 +3,7 @@ class Message
   attr_reader :id, :push_uri, :payload, :secret
   attr_reader :event_id, :subscription_id
 
-  def initialize(id:, push_uri:, payload:, secret:, event_id:, subscription_id:, content_type)
+  def initialize(id:, push_uri:, payload:, secret:, event_id:, subscription_id:, content_type:)
     @id = id
     @push_uri = push_uri
     @payload = payload

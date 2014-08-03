@@ -16,6 +16,7 @@ get '/' do
 end
 
 post '/events' do
+puts params.inspect
   secret = params[:secret]
   name = params[:name]
   version = params[:version] || 0

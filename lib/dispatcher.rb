@@ -21,7 +21,6 @@ class Dispatcher
 
   def on_alarm
     puts 'ALARM!'
-sleep 10
     loop do
       instruction = what_to_do
       case instruction

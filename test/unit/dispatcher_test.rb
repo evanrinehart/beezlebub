@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 require 'factories'
-require 'test_db'
+require 'db'
 require 'dispatcher'
 
 class DispatcherTest < Minitest::Test

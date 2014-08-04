@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>beezlebub</title>
+    <link rel="stylesheet" href="/css/global.css">
+  </head>
+
+  <body>
+    <div style="float: left; width: 120px">
+      <% if @nav %>
+      <% @nav.each do |link| %>
+      <div><a href="<%= link %>"><%= link %></a></div>
+      <% end %>
+      <% end %>
+    </div>
+    <%= yield %>
+
+    <script type="text/javascript">
+      document.addEventListener('click', function(e){
+        var elem = e.srcElement;
+        if(elem.webkitMatchesSelector('[data-method="delete"]')){
+          e.preventDefault();
+          var form = document.createElement('form');
+          form.setAttribute('action', elem.href);
+          form.setAttribute('method', 'POST');
+          form.innerHTML = '<input name="_method" value="delete">';
+          form.submit();
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -15,6 +15,10 @@ class Message < Sequel::Model
     )
   end
 
+  def app
+    subscription.app
+  end
+
   def push_uri
     subscription.push_uri
   end

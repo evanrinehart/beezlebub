@@ -3,9 +3,6 @@ require 'rack/test'
 
 require 'factories'
 
-require 'test_db'
-ENV['DATABASE_URL'] = ENV['TEST_DATABASE_URL']
-require 'app' #model, rename
 require_relative '../../app' #sinatra app
 
 class EventsTest < Minitest::Test

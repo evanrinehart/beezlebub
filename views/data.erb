@@ -1,0 +1,38 @@
+<style>
+
+table {
+  font-family: monospace;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  border-bottom: 1px solid gray;
+}
+
+td, th {
+  padding-right: 20px;
+}
+
+h1 {
+  font-family: monospace;
+}
+
+</style>
+
+<h1><%= @header %></h1>
+
+<table>
+<tr>
+  <% @headers.each do |header| %>
+    <th><%= header %></th>
+  <% end %>
+</tr>
+<% @rows.each do |row| %>
+<tr>
+  <% row.each do |cell| %>
+    <td><%= cell %></td>
+  <% end %>
+</tr>
+<% end %>
+</table>

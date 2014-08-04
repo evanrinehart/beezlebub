@@ -1,0 +1,31 @@
+<h1>messages</h1>
+
+<table>
+  <tr>
+    <th>id</th>
+    <th>status</th>
+    <th>event</th>
+    <th></th>
+    <th>from</th>
+    <th>to</th>
+    <th>created at</th>
+    <th>retry at</th>
+    <th>action</th>
+  </tr>
+  <% @messages.each do |message| %>
+    <tr>
+      <td><%= message.id %></td>
+      <td><%= message.status %></td>
+      <td><%= message.event.name %></td>
+      <td><%= message.event.id %></td>
+      <td><%= message.event.app.name %></td>
+      <td><%= message.push_uri %></td>
+      <td><%= show_time message.created_at%></td>
+      <td><%= show_time message.retry_at %></td>
+      <td>
+        
+        <a href="/a/messages/<%= message.id %>" data-method="delete">cancel</a>
+      </td>
+    </tr>
+  <% end %>
+</table>

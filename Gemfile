@@ -8,6 +8,10 @@ gem 'sequel'
 gem 'sinatra-sequel'
 gem 'foreman'
 
+group :development do
+  gem 'shotgun'
+end
+
 group :test do
   gem 'factory_girl'
   gem 'rack-test'

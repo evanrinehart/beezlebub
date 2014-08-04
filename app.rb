@@ -2,13 +2,13 @@ require 'sinatra'
 require 'sinatra/sequel'
 require 'json'
 
-require './lib/signaler'
+require 'signaler'
+
+require 'db'
+require 'app'
+require 'message'
 
 signaler = Signaler.new
-
-before do
-  content_type 'application/json'
-end
 
 before do
   if request.request_method == 'POST' && request.content_type == 'application/json'
@@ -22,9 +22,84 @@ before do
   end
 end
 
-get '/' do
-  signaler.signal # wake up the dispatcher if possible
-  JSON.pretty_generate database[:messages].all
+before do
+  @nav = [
+    '/a/events',
+    '/a/messages',
+    '/a/apps',
+    '/a/subscriptions'
+  ]
+end
+
+before '/a/*' do
+  # check cookie
+end
+
+helpers do
+  def show_time timestamp
+    if timestamp
+      timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    else
+      ''
+    end
+  end
+end
+
+get '/a/events' do
+  @header = 'events'
+  @headers = ['id', 'name', 'from', 'messages']
+  @rows = Event.all.map do |event|
+    [
+      event.id,
+      event.name,
+      event.app.name,
+      "/a/events/#{event.id}/messages"
+    ]
+  end
+  erb :data
+end
+
+get '/a/messages' do
+  @messages = Message
+    .eager(:subscription, :event)
+    .order(:status)
+  erb :messages
+end
+
+delete '/a/messages/:id' do
+  message = Message[params[:id]]
+  if message.status != 'pending'
+    halt 400, "don't try to cancel message #{message.id} currently (#{message.status})"
+  end
+  message.update :status => 'canceled'
+  redirect '/a/messages'
+end
+
+get '/a/subscriptions' do
+  @header = 'subscriptions'
+  @headers = ['id', 'subscriber', 'event', 'push_uri']
+  @rows = Subscription.all.map do |sub|
+    [
+      sub.id,
+      sub.app.name,
+      sub.event_name,
+      sub.push_uri
+    ]
+  end
+  erb :data
+end
+
+get '/a/apps' do
+  @header = 'apps'
+  @headers = ['id', 'name', 'secret']
+  @rows = App.all.map do |app|
+    [
+      app.id,
+      app.name,
+      app.secret
+    ]
+  end
+  erb :data
 end
 
 post '/events' do
@@ -65,6 +140,7 @@ post '/events' do
 
   signaler.signal # wake up the dispatcher if possible
 
+  content_type 'application/json'
   JSON.pretty_generate(
     :event_id => event_id,
     :message_count => count

@@ -17,9 +17,10 @@ class Dispatcher
 
   class DeliveryFailed < StandardError; end
 
-  def initialize(database:, sender:)
+  def initialize(database:, sender:, debug:false)
     @database = database
     @sender = sender
+    @debug = debug
   end
 
   def on_alarm
@@ -80,24 +81,24 @@ class Dispatcher
       begin
         @sender.attempt_send message
       rescue Sender::DeliveryFailed => e
-
         retry_at = Time.now + 15
+
         message.update(
           :delivered_at => Sequel::CURRENT_TIMESTAMP,
           :status => 'failed',
           :failure => e.message
         )
+
         message.new_retry(retry_at).save
+
         'failure'
-
       else
-
         message.update(
           :delivered_at => Sequel::CURRENT_TIMESTAMP,
           :status => 'delivered'
         )
-        'success'
 
+        'success'
       end
     end
   end

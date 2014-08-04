@@ -23,7 +23,7 @@ class EventsTest < Minitest::Test
     assert last_response.status == 403
 
     post "/events", {:secret => @app.secret}
-    assert last_response.status == 400
+    assert last_response.status == 400, "response was #{last_response.status}"
 
     count_before = $database[:events].where(:name => 'brew-coffee').count
 

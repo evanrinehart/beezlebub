@@ -96,13 +96,13 @@ end
 
 get '/a/events' do
   @header = 'events'
-  @headers = ['id', 'name', 'from', 'messages']
-  @rows = Event.all.map do |event|
+  @headers = ['id', 'name', 'from', 'message_count']
+  @rows = Event.eager(:messages).all.map do |event|
     [
       event.id,
       event.name,
       event.app.name,
-      "/a/events/#{event.id}/messages"
+      event.messages.count
     ]
   end
   erb :data

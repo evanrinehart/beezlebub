@@ -37,7 +37,11 @@ end
 helpers do
   def show_time timestamp
     if timestamp
-      timestamp.strftime('%Y-%m-%d %H:%M:%S')
+      if timestamp.to_date == Date.today
+        timestamp.strftime('%H:%M:%S')
+      else
+        timestamp.strftime('%Y-%m-%d')
+      end
     else
       ''
     end

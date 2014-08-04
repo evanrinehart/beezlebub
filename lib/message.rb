@@ -19,6 +19,10 @@ class Message < Sequel::Model
     subscription.app
   end
 
+  def pending?
+    status == 'pending'
+  end
+
   def push_uri
     subscription.push_uri
   end

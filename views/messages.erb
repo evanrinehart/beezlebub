@@ -19,12 +19,17 @@
       <td><%= message.event.name %></td>
       <td><%= message.event.id %></td>
       <td><%= message.event.app.name %></td>
-      <td><%= message.push_uri %></td>
+      <td><%= message.app.name %></td>
       <td><%= show_time message.created_at%></td>
       <td><%= show_time message.retry_at %></td>
       <td>
-        
-        <a href="/a/messages/<%= message.id %>" data-method="delete">cancel</a>
+        <% if message.pending? %>
+          <a
+            href="/a/messages/<%= message.id %>"
+            data-method="delete">
+            cancel
+          </a>
+        <% end %>
       </td>
     </tr>
   <% end %>

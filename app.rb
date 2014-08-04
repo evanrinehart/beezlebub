@@ -111,8 +111,20 @@ end
 get '/a/messages' do
   @messages = Message
     .eager(:subscription, :event)
-    .order(:status)
+    .order(:id)
   erb :messages
+end
+
+get '/a/messages/:id' do
+  message = Message[params[:id]]
+  content_type 'text/plain'
+  if !message
+    halt 404, '404'
+  elsif message.failed?
+    "#{message.header}\nfailure:\n#{message.failure}"
+  else
+    message.header
+  end
 end
 
 delete '/a/messages/:id' do

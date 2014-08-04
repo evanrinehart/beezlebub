@@ -23,6 +23,18 @@ class Message < Sequel::Model
     status == 'pending'
   end
 
+  def failed?
+    status == 'failed'
+  end
+
+  def canceled?
+    status == 'canceled'
+  end
+
+  def delivered?
+    status == 'delivered'
+  end
+
   def push_uri
     subscription.push_uri
   end
@@ -37,6 +49,19 @@ class Message < Sequel::Model
 
   def secret
     subscription.app.secret
+  end
+
+  def header
+%Q{message #{id}
+event: #{event.name}
+from: #{event.app.name}
+to: #{subscription.app.name}
+status: #{status}
+delivered_at: #{delivered_at || '(not yet)'}
+retry_at: #{retry_at || '(never)'}
+push_uri: #{push_uri}
+payload: #{payload}
+}
   end
 
 end

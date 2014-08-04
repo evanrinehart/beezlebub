@@ -15,7 +15,13 @@
   <% @messages.each do |message| %>
     <tr>
       <td><%= message.id %></td>
-      <td><%= message.status %></td>
+      <td>
+        <% if message.failed? %>
+          <a href="/a/messages/<%= message.id %>"><%= message.status %></a>
+        <% else %>
+          <%= message.status %>
+        <% end %>
+      </td>
       <td><%= message.event.name %></td>
       <td><%= message.event.id %></td>
       <td><%= message.event.app.name %></td>

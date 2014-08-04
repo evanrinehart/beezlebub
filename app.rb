@@ -71,7 +71,7 @@ post '/events' do
     subscriptions = Subscription.where(:event_name => name)
     new_messages = subscriptions.map do |row|
       {
-        :event_id => event_id,
+        :event_id => event.id,
         :subscription_id => row[:id],
         :status => 'pending'
       }

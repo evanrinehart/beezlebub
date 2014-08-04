@@ -7,11 +7,17 @@ require 'message'
 require 'exception'
 require 'sender'
 
+puts 'loading'
 class Dispatcher
 
   include Alarm
   # run
   # set_interruptible_alarm_for
+
+  if ENV['RETRY_TIME'] !~ /\A\d+\z/
+    raise "set env var RETRY_TIME to an integer"
+  end
+  RETRY_TIME = ENV['RETRY_TIME'].to_i
 
   attr_reader :database
 
@@ -81,7 +87,7 @@ class Dispatcher
       begin
         @sender.attempt_send message
       rescue Sender::DeliveryFailed => e
-        retry_at = Time.now + 15
+        retry_at = Time.now + RETRY_TIME
 
         message.update(
           :delivered_at => Sequel::CURRENT_TIMESTAMP,

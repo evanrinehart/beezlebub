@@ -122,13 +122,14 @@ end
 
 get '/a/subscriptions' do
   @header = 'subscriptions'
-  @headers = ['id', 'subscriber', 'event', 'push_uri']
+  @headers = ['id', 'subscriber', 'event', 'push_uri', 'note']
   @rows = Subscription.all.map do |sub|
     [
       sub.id,
       sub.app.name,
       sub.event_name,
-      sub.push_uri
+      sub.push_uri,
+      sub.note
     ]
   end
   erb :data
